@@ -1,7 +1,7 @@
 Lego Thief Game Project
 ================
 
-# Story
+## Story
 
 You are a thief and break into a bank. After you made your way into the bank, you use your thief robot to steal the diamond. Using your computer application you try to navigate it to the safe (you can see the view from a camera mounted on the robot). There are watch dog robots patrolling the bank. In the beginning they are not very alert and patrol only slowly. In the bank there are several obstacles, like a tunnel and a ridge you have to overcome to find the safe.
 
