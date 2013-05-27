@@ -1,0 +1,45 @@
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+public class GUI extends JFrame {
+	
+	public GUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Lesson5");
+		setSize(500, 400);
+		setLocationRelativeTo(null);
+
+		JPanel p1 = new JPanel();
+		p1.add(new JButton("HI"));
+		GridLayout l = new GridLayout(8,2);
+		l.setColumns(2);
+		p1.setLayout(l);
+		getContentPane().add(p1);
+		
+		FrameGrabber grabber = new FrameGrabber();
+	    if (grabber.init()==true) {
+	        BufferedImage frame = grabber.grab();
+	        ImageIcon icon = new ImageIcon(frame); 
+	        JLabel thumb = new JLabel();
+	        thumb.setIcon(icon);
+	    }
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				GUI ex = new GUI();
+				ex.setVisible(true);
+			}
+		});
+
+	}
+
+}
