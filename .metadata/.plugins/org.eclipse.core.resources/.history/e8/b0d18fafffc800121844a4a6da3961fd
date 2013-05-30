@@ -1,0 +1,53 @@
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import javax.swing.*;
+
+
+import com.googlecode.javacv.OpenCVFrameGrabber;
+
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import static com.googlecode.javacv.cpp.opencv_highgui.*;
+
+public class GUI extends JFrame {
+	
+	public GUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Lesson5");
+		setSize(1280, 768);
+		//setUndecorated(true);
+		setLocationRelativeTo(null);
+		
+		
+		
+		getContentPane().setLayout(null);
+		
+		JPanel hud = new JPanel();
+		hud.setLayout(null);
+		hud.setSize(200, 768);
+		hud.setLocation(1024,0);
+		hud.add(new JButton("hi"));
+		getContentPane().add(hud);
+		
+		GrabberShow gs = new GrabberShow();
+        Thread th = new Thread(gs);
+        th.start();
+        gs.setSize(1024, 768);
+        gs.setLocation(0,0);
+        getContentPane().add(gs);
+        
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				GUI ex = new GUI();
+				ex.setVisible(true);
+			}
+		});
+
+	}
+
+}

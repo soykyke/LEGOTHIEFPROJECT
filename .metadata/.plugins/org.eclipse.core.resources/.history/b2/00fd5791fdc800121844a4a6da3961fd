@@ -1,0 +1,14 @@
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class ContentFrame extends JPanel {
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		// TODO Auto-generated method stub
+		// super.paintComponent(arg0);
+		g.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer)
+	}	
+
+}

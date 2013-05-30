@@ -1,42 +1,42 @@
-import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
-import com.googlecode.javacv.CanvasFrame;
+import java.awt.Graphics;
 import com.googlecode.javacv.FrameGrabber;
 import com.googlecode.javacv.VideoInputFrameGrabber;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import javax.swing.*;
 
-public class GrabberShow implements Runnable {
-	//final int INTERVAL=1000;///you may use interval
+public class GrabberShow extends JPanel implements Runnable {
 	IplImage image;
-	JPanel panel;
-	CanvasFrame canvas = new CanvasFrame("Web Cam");
+	IplImage img;
+	int width;
+	int height;
 	
-	public GrabberShow(JPanel p) {
-		panel = p;
-		canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+	public GrabberShow(int w, int h) {
+		width = w;
+		height = h;
 	}
 	
 	@Override
 	public void run() {
-		FrameGrabber grabber = new VideoInputFrameGrabber(3); // 1 for next camera
-		int i=0;
+		FrameGrabber grabber = new VideoInputFrameGrabber(2); // 1 for next camera
 		try {
 			grabber.start();
-			IplImage img;
-canvas.add(panel);
+			
 			while (true) {
 				img = grabber.grab();
 				if (img != null) {
-					cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
-							// show image on window
-					canvas.showImage(img);
+					this.repaint();
 				}
-				//Thread.sleep(INTERVAL);
 			}
 		} catch (Exception e) {
 		}
 	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		g.drawImage(img.getBufferedImage(), 0, 0, width, height, null);
+}
+	
+	
 }
 
 
