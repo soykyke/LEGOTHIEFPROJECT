@@ -6,12 +6,14 @@ public class Safe extends Thread {
 
     int[] key;
     long timeoutLength = 30000;
+    DataOutputStream axe;
 
 
     TouchSensor[] buttons = {new TouchSensor(SensorPort.S1), new TouchSensor(SensorPort.S2), new TouchSensor(SensorPort.S3)};
 
-    public Safe(int[] key) {
+    public Safe(int[] key, DataOutputStream dos) {
         this.key = key;
+        this.dos = dos;
     }
 
     public void run() {
@@ -116,6 +118,7 @@ public class Safe extends Thread {
         LCD.drawString("Succeeded   ", 0, 0);
         Sound.beepSequenceUp();
         sendStolenMessage();
+        Axe.setTurning();
         Thread.sleep(1500);
     }
 
@@ -129,6 +132,8 @@ public class Safe extends Thread {
     void sendStolenMessage() throws InterruptedException    {
         LCD.clearDisplay();
         LCD.drawString("Sending stolen Msg", 0, 1);
+        dos.writeChars("Stolen");
+        dos.flush();
         Thread.sleep(1500);
     }
 }
