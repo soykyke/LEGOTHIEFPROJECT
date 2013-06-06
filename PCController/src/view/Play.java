@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.TimerTask;
 
 import javax.swing.*;
 
@@ -31,6 +32,9 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	
 	Controller controller;
 	JPanel hud;
+	JLabel diamondImageLabel;
+	java.util.Timer refreshTimer;
+	
 	public Play(Controller c)  {
 		controller = c;
 		
@@ -64,13 +68,20 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         controls.setLocation(VIDEO_WIDTH, 0);
         controls.setLayout(null);
         controls.setBackground(Color.WHITE);
+        
+
+        JLabel headingLabel = new JLabel("Steal the diamond");
+        headingLabel.setLocation(20, 20);
+        headingLabel.setSize(200, 50);
+        headingLabel.setLayout(null);
+        headingLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        controls.add(headingLabel);
 		
-        JLabel label = new JLabel("THIEF");
-		label.setLocation(50, 20);
-		label.setLayout(null);
-		label.setFont(new Font("Serif", Font.PLAIN, 50));
-		label.setSize(150, 100);
-		controls.add(label);
+        diamondImageLabel = new JLabel(new ImageIcon("images/bank.jpg"));
+		diamondImageLabel.setLocation(20, 250);
+		diamondImageLabel.setLayout(null);
+		diamondImageLabel.setSize(199, 177);
+		controls.add(diamondImageLabel);
 		
 		
 		JLabel arrowLabel = new JLabel(new ImageIcon("images/uparrow.jpg"));
@@ -88,6 +99,21 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 		
 		getContentPane().add(hud);
 		getContentPane().setBackground(Color.GRAY);
+		
+		refreshTimer = new java.util.Timer();
+		refreshTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		}, 1000, 1000);
+	}
+	
+	void refresh() {
+		if (Controller.diamondState == Controller.DiamondState.Stolen) {
+			diamondImageLabel.setIcon(new ImageIcon("images/diamond.gif"));
+			diamondImageLabel.setText("STOLEN");
+		}
 	}
 	
 	int getHPosition(int relative) {

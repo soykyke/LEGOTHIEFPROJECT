@@ -8,7 +8,6 @@ import communications.commDirections;
 
 public class Controller 
 {
-
     private CommBT commBT = new CommBT();
 
     public Controller() 
@@ -29,12 +28,10 @@ public class Controller
     	commBT.closeConnection();
         // Shut down light sensor, motors
         Car.closeDirections();
-        
     }
-	
+    
     public static void main(String[] args) 
     {
-    	
         Controller controller = new Controller();
         
         controller.controlDirecions();

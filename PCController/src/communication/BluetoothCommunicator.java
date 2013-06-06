@@ -64,4 +64,13 @@ public class BluetoothCommunicator {
 			e.printStackTrace();
 		}
 	}
+	
+	public String readString() {
+		try {
+			return dis.readUTF();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 }
