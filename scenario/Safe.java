@@ -1,12 +1,20 @@
-import lejos.nxt.*;
-import java.util.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import lejos.nxt.LCD;
+import lejos.nxt.SensorPort;
+import lejos.nxt.Sound;
+import lejos.nxt.TouchSensor;
 
 
 public class Safe extends Thread {
 
     int[] key;
     long timeoutLength = 30000;
-    DataOutputStream axe;
+    DataOutputStream dos;
 
 
     TouchSensor[] buttons = {new TouchSensor(SensorPort.S1), new TouchSensor(SensorPort.S2), new TouchSensor(SensorPort.S3)};
@@ -30,7 +38,10 @@ public class Safe extends Thread {
             }
         } catch (InterruptedException e) {
 
-        }
+        } catch (IOException e) {
+        	LCD.clearDisplay();
+        	LCD.drawString("BT Error",0, 0);
+		}
     }
 
     /* can press each button only once, to make detection easier
@@ -113,7 +124,7 @@ public class Safe extends Thread {
         Thread.sleep(1500);
     }
 
-    void succeed() throws InterruptedException {
+    void succeed() throws InterruptedException, IOException {
         LCD.clearDisplay();
         LCD.drawString("Succeeded   ", 0, 0);
         Sound.beepSequenceUp();
@@ -129,7 +140,7 @@ public class Safe extends Thread {
         Thread.sleep(1500);
     }
 
-    void sendStolenMessage() throws InterruptedException    {
+    void sendStolenMessage() throws InterruptedException, IOException    {
         LCD.clearDisplay();
         LCD.drawString("Sending stolen Msg", 0, 1);
         dos.writeChars("Stolen");

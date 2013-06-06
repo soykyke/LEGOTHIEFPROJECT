@@ -1,17 +1,18 @@
-import lejos.nxt.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import lejos.nxt.LCD;
+import lejos.nxt.comm.Bluetooth;
+import lejos.nxt.comm.NXTConnection;
 
 public class Scenario {
     public static void main(String[] args) {
         DataOutputStream dos = null, dis = null;
-        try {
-            NXTConnection btc = Bluetooth.waitForConnection();
-            DataOutputStream dos;
-            dos = btc.openDataOutputStream();   
-            dis = btc.openDataInputStream();   
-        } catch (IOException e) {
-            LCD.drawString("Error BT connection", 0, 0);
-            return;
-        }
+        NXTConnection btc = Bluetooth.waitForConnection();
+		
+		dos = btc.openDataOutputStream();   
+		dis = btc.openDataOutputStream();
 
         int[] key = {0,1,2};
         new Safe(key, dos).start();
@@ -19,15 +20,24 @@ public class Scenario {
         boolean timeout = false;
         while (!timeout) {
             checkForTimeout(dis);
-            Thread.sleep(100);
+            try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
         }
         Axe.rotateToBlockPosition();
 
-        dis.close();
-        dos.close();
+        try {
+			dis.close();
+			dos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
     }
 
-    static void checkForTimeout(DataInputStream dis) {
+    static void checkForTimeout(DataOutputStream dis) {
         //TODO:
     }
 }
