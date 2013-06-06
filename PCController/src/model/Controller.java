@@ -3,17 +3,17 @@ import javax.swing.SwingUtilities;
 
 import view.GUI;
 import view.Play;
-import communication.CommBT;
+import communication.ThiefCommunicator;
 
 
 
 
 public class Controller {
 
-	private CommBT commBT;
+	private ThiefCommunicator commBT;
 
 	public Controller(){
-		commBT = new CommBT();
+		commBT = new ThiefCommunicator();
 		connect();
 	}
 

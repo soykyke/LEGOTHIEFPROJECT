@@ -1,14 +1,13 @@
 package view;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import view.GrabberShow;
 
@@ -60,11 +59,27 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         gs.setOpaque(false);
         hud.add(gs);
         
-		JButton btn = new JButton("hey");
-		btn.setSize(100, 100);
-		btn.setLocation(VIDEO_WIDTH, 0);
-		btn.setLayout(null);
-		hud.add(btn);
+        JPanel controls = new JPanel();
+        controls.setSize(SCREEN_WIDTH - VIDEO_WIDTH, SCREEN_HEIGHT);
+        controls.setLocation(VIDEO_WIDTH, 0);
+        controls.setLayout(null);
+        controls.setBackground(Color.WHITE);
+		
+        JLabel label = new JLabel("THIEF");
+		label.setLocation(50, 20);
+		label.setLayout(null);
+		label.setFont(new Font("Serif", Font.PLAIN, 50));
+		label.setSize(150, 100);
+		controls.add(label);
+		
+		
+		JLabel arrowLabel = new JLabel(new ImageIcon("images/uparrow.jpg"));
+		arrowLabel.setSize(150, 174);
+		arrowLabel.setLocation(50, 500);
+		arrowLabel.setLayout(null);
+		controls.add(arrowLabel);
+		
+		hud.add(controls);
 		
 		hud.requestFocus();
 		hud.requestFocusInWindow();
