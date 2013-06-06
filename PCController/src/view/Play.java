@@ -55,23 +55,14 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         th.start();
 		
         gs.setSize(VIDEO_WIDTH, VIDEO_HEIGHT);
-        gs.setLocation(getHPosition(0), getVPosition(0));
+        gs.setLocation(0, 0);
         gs.setBackground(Color.BLACK);
         gs.setOpaque(false);
         hud.add(gs);
         
-		/*JPanel controlPanel = new JPanel();
-		controlPanel.setSize(SCREEN_WIDTH - VIDEO_WIDTH, SCREEN_HEIGHT);
-		controlPanel.setLocation(VIDEO_WIDTH, 0);
-		controlPanel.add(new JButton("hi"));
-		controlPanel.add(new JButton("hi"));
-		controlPanel.add(new JButton("hi"));
-		controlPanel.setVisible(true);
-		controlPanel.setBackground(Color.YELLOW);*/
-		
 		JButton btn = new JButton("hey");
 		btn.setSize(100, 100);
-		btn.setLocation(getHPosition(VIDEO_WIDTH), getVPosition(0));
+		btn.setLocation(VIDEO_WIDTH, 0);
 		btn.setLayout(null);
 		hud.add(btn);
 		
@@ -92,6 +83,9 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	int getVPosition(int relative) {
+		int h = this.getBounds().height;
+		if (h > SCREEN_HEIGHT)
+			return (h - SCREEN_HEIGHT) / 2 + relative;
 		return relative;
 	}
 
