@@ -112,7 +112,7 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	void refresh() {
-		if (Controller.diamondState == Controller.DiamondState.Stolen) {
+		if (Controller.gameState == Controller.GameState.DiamondStolen) {
 			diamondImageLabel.setIcon(new ImageIcon("images/diamond.gif"));
 			headingLabel.setText("<html>DIAMOND STOLEN,<br>GET OUT!</html>");
 		}

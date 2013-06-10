@@ -11,17 +11,20 @@ import communication.ThiefCommunicator;
 
 public class Controller {
 
-	public enum DiamondState {
-		InSafe,
-		Stolen
+	public enum GameState {
+		DiamondInSafe,
+		DiamondStolen,
+		GameOver,
+		Won
 	}
-	
+
 	private ThiefCommunicator thiefCommunicator;
 	private ScenarioCommunicator scenarioCommunicator;
-	public static DiamondState diamondState;
+	public static GameState gameState;
+	private static int energy = 100;
 
 	public Controller(){
-		diamondState = DiamondState.InSafe;
+		gameState = GameState.DiamondInSafe;
 		thiefCommunicator = new ThiefCommunicator();
 		scenarioCommunicator = new ScenarioCommunicator();
 		connect();
@@ -38,7 +41,18 @@ public class Controller {
 	}
 
     public static void diamondStolen() {
-    	diamondState = DiamondState.Stolen;
+    	gameState = GameState.DiamondStolen;
+    }
+    
+    public static void bittenByDog() {
+    	energy -= 20;
+    	if (energy <= 0)
+    		gameState = GameState.GameOver;
+    }
+    
+    public static void gotOutOfBank() {
+    	if (gameState == GameState.DiamondStolen)
+    		gameState = GameState.Won;
     }
 	
 	public static void main(String[] args) {
