@@ -37,8 +37,9 @@ public class Controller
 	    	while (!Button.ESCAPE.isDown()) {
 	    		int colorId = sensor.getColorID();
 				LCD.drawString("Color " + Integer.toString(colorId), 0, 0);
-				if (colorId == Color.GREEN)
+				if (colorId == Color.GREEN){
 					sendFinishMessage();
+				}
 
 				Thread.sleep(10);
 	    	}
@@ -63,9 +64,11 @@ public class Controller
 
 	public void sendFinishMessage() {
 		try {
+			LCD.drawString("I AM HERE", 5, 5);
 			commBT.writeInt(1337);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			LCD.drawString("I AM IN EXCEPTION", 5, 5);
 			e.printStackTrace();
 		}
 	}
