@@ -1,4 +1,10 @@
 package model;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.*;
+import java.awt.event.*;
+
 import javax.swing.SwingUtilities;
 
 import view.GUI;
@@ -20,7 +26,9 @@ public class Controller {
 
 	private ThiefCommunicator thiefCommunicator;
 	private ScenarioCommunicator scenarioCommunicator;
+	private static Timer countdownTimer;
 	public static GameState gameState;
+	public static int countdownSecs = 180;
 	private static int energy = 100;
 
 	public Controller(){
@@ -42,6 +50,17 @@ public class Controller {
 
     public static void diamondStolen() {
     	gameState = GameState.DiamondStolen;
+
+    	Controller.countdownTimer = new Timer();
+    	Controller.countdownTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+            	countdownSecs--;
+                if (countdownSecs == 0) {
+                	Controller.gameState = Controller.GameState.GameOver;
+                	Controller.countdownTimer.cancel();
+                }
+            }
+        }, 1000, 1000);
     }
     
     public static void bittenByDog() {
