@@ -9,3 +9,4 @@
 .metadata
 *.classpath
 scenario/bin/
+PCController/bin/
