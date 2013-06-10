@@ -7,3 +7,5 @@
 
 # Eclipse stuff #
 .metadata
+*.classpath
+scenario/bin/

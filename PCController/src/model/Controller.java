@@ -30,7 +30,7 @@ public class Controller {
 	private static Timer countdownTimer;
 	public static GameState gameState;
 	public static int countdownSecs = 180;
-	private static int energy = 100;
+	public static int energy = 100;
 
 	public Controller(){
 		gameState = GameState.DiamondInSafe;

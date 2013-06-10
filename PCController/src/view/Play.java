@@ -37,6 +37,7 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	java.util.Timer refreshTimer;
 	GrabberShow gs;
 	JLabel overlayLabel;
+	JLabel energyLabel;
 	
 	public Play(Controller c)  {
 		controller = c;
@@ -91,16 +92,17 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         controls.add(headingLabel);
 		
         diamondImageLabel = new JLabel(new ImageIcon("images/bank.jpg"));
-		diamondImageLabel.setLocation(20, 250);
+		diamondImageLabel.setLocation(20, 300);
 		diamondImageLabel.setLayout(null);
 		diamondImageLabel.setSize(199, 177);
 		controls.add(diamondImageLabel);
 		
-		JLabel arrowLabel = new JLabel(new ImageIcon("images/uparrow.jpg"));
-		arrowLabel.setSize(150, 174);
-		arrowLabel.setLocation(50, 500);
-		arrowLabel.setLayout(null);
-		controls.add(arrowLabel);
+		energyLabel = new JLabel();
+		energyLabel.setSize(SCREEN_WIDTH - VIDEO_WIDTH, 250);
+		energyLabel.setLocation(50, 550);
+		energyLabel.setLayout(null);
+        energyLabel.setFont(new Font("Serif", Font.BOLD, 25));
+		controls.add(energyLabel);
 		
 		hud.add(controls, 1, 0);
 		
@@ -146,6 +148,9 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 			gs.greyOut = true;
 			break;
 		}
+		energyLabel.setText("<html>Your energy:<br>"
+				+ Integer.toString(Controller.energy)
+				+ "%</html>");
 	}
 	
 	int getHPosition(int relative) {
