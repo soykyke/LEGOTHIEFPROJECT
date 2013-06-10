@@ -5,38 +5,24 @@ import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
-import lejos.nxt.UltrasonicSensor;
-import lejos.nxt.addon.IRSeeker;
+import lejos.nxt.addon.IRSeekerV2;
+import lejos.nxt.addon.IRSeekerV2.Mode;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 
 
 public class WatchDog {
 	/*public static void main(String[] args) {
-		IRSeeker seeker = new IRSeeker(SensorPort.S4);
 		LightSensor light = new LightSensor(SensorPort.S1);
-		seeker.setAddress(0x10);
-	    Motor.A.setSpeed(400);
-	    Motor.C.setSpeed(400);
 		while (!Button.ESCAPE.isPressed()) {
-			int direction = seeker.getDirection();
 	        LCD.clear();
-	        LCD.drawInt(direction, 2,2);
-	        LCD.drawInt(seeker.getSensorValue(direction), 3,3);
-	        LCD.refresh();
-			Motor.A.forward();
-			Motor.C.forward();
-			int now = (int)System.currentTimeMillis();
-			while (((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
-				Thread.yield(); //don't exit till suppressed
+	        LCD.drawInt(light.getLightValue(), 2,2);
 			}
 	    }
-	}	*/
+	}*/	
 	
 	public static void main(String[] args) {
-	    Motor.A.setSpeed(400);
-	    Motor.C.setSpeed(400);
-	    DifferentialPilot pilot = new DifferentialPilot(5.6f, 17.5f, Motor.C, Motor.A, true);
+	    DifferentialPilot pilot = new DifferentialPilot(5.6f, 15.3f, Motor.A, Motor.C, false);
 	    Navigator navigator = new Navigator(pilot);
 	    Behavior b1 = new ChaseThief(pilot, navigator);
 	    Behavior b2 = new Watch(pilot, navigator);
@@ -58,30 +44,23 @@ public class WatchDog {
 
 class ChaseThief implements Behavior {
 	private boolean _suppressed = false;
-	private IRSeeker seeker;
+	private IRSeekerV2 seeker;
 	private DifferentialPilot pilot;
 	private Navigator navigator;
 	
 	public ChaseThief(DifferentialPilot pilot, Navigator navigator) {
-		seeker = new IRSeeker(SensorPort.S4);
-		seeker.setAddress(0x10);
+		seeker = new IRSeekerV2(SensorPort.S4, Mode.AC);
+		//seeker.setAddress(0x10);
 		this.pilot = pilot;
 		this.navigator = navigator;
 		//this.setDaemon(true);
 		//this.start();
 	}
 	
-	/*public void run() {
-		while ( true )  { 
-			LCD.drawString(Integer.toString(seeker.getDirection()),0,6);
-			LCD.drawString(Integer.toString(seeker.getSensorValue(seeker.getDirection())),4,6);
-		}
-	}*/
-	
 	public int takeControl() {
-		if (seeker.getDirection() >= 3 && seeker.getDirection() <= 7)
+		//if (seeker.getDirection() >= 3 && seeker.getDirection() <= 7)
 			return 90;
-	    return 0;  // this behavior always wants control.
+	    //return 0;  // this behavior always wants control.
 	}
 
 	public void suppress() {
@@ -91,19 +70,49 @@ class ChaseThief implements Behavior {
 	public void action() {
 		_suppressed = false;
 		LCD.drawString("Chase",0,5);
-		LCD.drawInt(seeker.getDirection(),0,6);
-		Motor.A.setSpeed(850);
-	    Motor.C.setSpeed(850);
-		pilot.rotate((5 - seeker.getDirection()) * 30);
-		Motor.A.forward();
-		Motor.C.forward();
-		int now = (int)System.currentTimeMillis();
-		while (!_suppressed && ((int)System.currentTimeMillis()< now + 500) ) {
+		int direction = seeker.getDirection();
+		int distances[] = seeker.getSensorValues();
+		int distance = 0;
+		double angle = seeker.getAngle() * (-1);
+		LCD.drawInt(direction,0,6);
+		if (direction == 1) {
+			distance = distances[0];
+		}
+		if (direction == 2) {
+			distance = (distances[0] + distances[1]) / 2;
+		}
+		if (direction == 3) {
+			distance = distances[1];
+		}
+		if (direction == 4) {
+			distance = (distances[1] + distances[2]) / 2;
+		}
+		if (direction == 5) {
+			distance = distances[2];
+		}
+		if (direction == 6) {
+			distance = (distances[2] + distances[3]) / 2;
+		}
+		if (direction == 7) {
+			distance = distances[3];
+		}
+		if (direction == 8) {
+			distance = (distances[3] + distances[4]) / 2;
+		}
+		if (direction == 9) {
+			distance = distances[4];
+		}
+		LCD.drawInt(distance,4,6);
+		pilot.setTravelSpeed(1000);
+		pilot.setRotateSpeed(1000);
+		pilot.rotate(angle);
+		while (!_suppressed && pilot.isMoving()) {
 			Thread.yield(); //don't exit till suppressed
 		}
-		 
-		//Motor.C.stop();
-		//Motor.A.stop();
+		pilot.travel(distance / 10);
+		while (!_suppressed && pilot.isMoving()) {
+			Thread.yield(); //don't exit till suppressed
+		}
 	}
 }
 
@@ -135,35 +144,34 @@ class Watch implements Behavior {
 	public void action() {
 		_suppressed = false;
 		LCD.drawString("Watch",0,5);
+		pilot.setTravelSpeed(500 + Math.random() * 100);
+		pilot.setRotateSpeed(500 + Math.random() * 100);
 		while (need > 0) {
-		    Motor.A.setSpeed(500 + (int)(Math.random() * ((700 - 500) + 1)));
-		    Motor.C.setSpeed(500 + (int)(Math.random() * ((700 - 500) + 1)));
-			Motor.A.forward();
-			Motor.C.forward();
+			pilot.forward();
 			int now = (int)System.currentTimeMillis();
 			while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
 				Thread.yield(); //don't exit till suppressed
 			}
-		    
-			// Stop for 1000 msec
-			LCD.drawString("Stopped       ",0,3);
-			Motor.A.stop(); 
-			Motor.C.stop();
+			pilot.stop();
+			need -= 700;
+			if (_suppressed)
+				break;
+			pilot.rotate(Math.random() * 720 - 360);
 			now = (int)System.currentTimeMillis();
 			while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
 				Thread.yield(); //don't exit till suppressed
 			}
-		    
-			// Turn
-			LCD.drawString("Turn          ",0,3);
-			Motor.A.rotate((-180 + (int)(Math.random() * ((-100 + 180) + 1))), true);// start Motor.A rotating backward
-			Motor.C.rotate((-360 + (int)(Math.random() * ((-260 + 360) + 1))), true);  // rotate C farther to make the turn
-			while (!_suppressed && Motor.C.isMoving()) {
+			pilot.stop();
+			need -= 700;
+			if (_suppressed)
+				break;
+			pilot.forward();
+			now = (int)System.currentTimeMillis();
+			while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
 				Thread.yield(); //don't exit till suppressed
 			}
-			Motor.A.stop(); 
-			Motor.C.stop();
-			need -= 2000;
+			pilot.stop();
+			need -= 700;
 			if (_suppressed)
 				break;
 		}
@@ -191,33 +199,26 @@ class Walk implements Behavior {
 	public void action() {
 		_suppressed = false;
 		LCD.drawString("Walk",0,5);
-	    Motor.A.setSpeed(300 + (int)(Math.random() * ((500 - 300) + 1)));
-	    Motor.C.setSpeed(300 + (int)(Math.random() * ((500 - 300) + 1)));
-		Motor.A.forward();
-		Motor.C.forward();
+		pilot.setTravelSpeed(400 + Math.random() * 100);
+		pilot.setRotateSpeed(400 + Math.random() * 100);
+		pilot.forward();
 		int now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
 			Thread.yield(); //don't exit till suppressed
 		}
-	    
-		// Stop for 1000 msec
-		LCD.drawString("Stopped       ",0,3);
-		Motor.A.stop(); 
-		Motor.C.stop();
+		pilot.stop();
+		pilot.rotate(Math.random() * 720 - 360);
 		now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
 			Thread.yield(); //don't exit till suppressed
 		}
-	    
-		// Turn
-		LCD.drawString("Turn          ",0,3);
-		Motor.A.rotate((-180 + (int)(Math.random() * ((-100 + 180) + 1))), true);// start Motor.A rotating backward
-		Motor.C.rotate((-360 + (int)(Math.random() * ((-260 + 360) + 1))), true);  // rotate C farther to make the turn
-		while (!_suppressed && Motor.C.isMoving()) {
+		pilot.stop();
+		pilot.forward();
+		now = (int)System.currentTimeMillis();
+		while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
 			Thread.yield(); //don't exit till suppressed
 		}
-		Motor.A.stop(); 
-		Motor.C.stop();
+		pilot.stop();
 	}
 }
 
@@ -249,17 +250,22 @@ class Eate implements Behavior {
 
 	public void action() {
 		_suppressed = false;
+		active = false;
 		LCD.drawString("Eate",0,5);
-	    Motor.A.setSpeed(400);
-	    Motor.C.setSpeed(400);
+		pilot.setTravelSpeed(500);
+		pilot.setRotateSpeed(500);
 		navigator.goTo(50, 50);
-	    active = true;
-	    int now = (int)System.currentTimeMillis();
-		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
+		while (!_suppressed && navigator.isMoving() ) {
 			Thread.yield(); //don't exit till suppressed
 		}
-		active = false;
-	    need = 0;
+	    int now = (int)System.currentTimeMillis();
+		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
+			active = true;
+			Thread.yield(); //don't exit till suppressed
+		}
+		if (active == true) {
+			need = need - ((int)System.currentTimeMillis() - now);
+		}
 	}
 }
 
@@ -348,7 +354,7 @@ class DetectGreenZone extends Thread implements Behavior {
 	  _suppressed = false;
 	  active = true;
 	  LCD.drawString("DGZ",0,5);
-	  Sound.beepSequenceUp();
+	  /*Sound.beepSequenceUp();
 	
 	  // Backward for 1000 msec
 	  LCD.drawString("Drive backward",0,3);
@@ -379,9 +385,28 @@ class DetectGreenZone extends Thread implements Behavior {
 	  Motor.C.stop();
 	  LCD.drawString("Stopped       ",0,3);
 	  Sound.beepSequence();
-	  active = false;  
+	  active = false;  */
+	  	pilot.setTravelSpeed(400 + Math.random() * 100);
+	  	pilot.setRotateSpeed(400 + Math.random() * 100);
+	  	pilot.backward();
+	  	int now = (int)System.currentTimeMillis();
+	  	while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  		Thread.yield(); //don't exit till suppressed
+	  	}
+	  	pilot.stop();
+	  	pilot.rotate(180);
+	  	now = (int)System.currentTimeMillis();
+	  	while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  		Thread.yield(); //don't exit till suppressed
+	  	}
+	  	pilot.stop();
+	  	pilot.forward();
+	  	now = (int)System.currentTimeMillis();
+	  	while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  		Thread.yield(); //don't exit till suppressed
+	  	}
+	  	pilot.stop();
 	}
-
 }
 
 class DetectThief implements Behavior {
