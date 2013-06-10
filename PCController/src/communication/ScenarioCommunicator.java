@@ -4,9 +4,9 @@ import model.Controller;
 
 public class ScenarioCommunicator extends BluetoothCommunicator {
 	public ScenarioCommunicator() {
-		super("NXT", "00:16:53:18:09:06");
+		super("fedor", "00:16:53:15:C2:59");
 	}
-
+	
 	public void readMessages() {
 		new Thread() { 
 			public void run () {
@@ -17,9 +17,9 @@ public class ScenarioCommunicator extends BluetoothCommunicator {
 	
 	public void listenForMessages() {
 		while (true) {
-			String s = readString();
-			switch (s) {
-			case "Stolen":
+			int msg = readInt();
+			switch (msg) {
+			case 1:
 				Controller.diamondStolen();
 				break;
 			}

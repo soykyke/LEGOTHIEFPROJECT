@@ -65,12 +65,12 @@ public class BluetoothCommunicator {
 		}
 	}
 	
-	public String readString() {
+	public int readInt() {
 		try {
-			return dis.readUTF();
+			return dis.readInt();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "";
+		return 0;
 	}
 }

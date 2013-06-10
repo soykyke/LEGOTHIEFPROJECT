@@ -33,6 +33,7 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	Controller controller;
 	JPanel hud;
 	JLabel diamondImageLabel;
+	JLabel headingLabel;
 	java.util.Timer refreshTimer;
 	
 	public Play(Controller c)  {
@@ -70,11 +71,12 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         controls.setBackground(Color.WHITE);
         
 
-        JLabel headingLabel = new JLabel("Steal the diamond");
-        headingLabel.setLocation(20, 20);
-        headingLabel.setSize(200, 50);
+        headingLabel = new JLabel("<html>STEAL<br>THE<br>DIAMOND!</html>");
+        headingLabel.setLocation(0, 0);
+        headingLabel.setSize(SCREEN_WIDTH - VIDEO_WIDTH, 250);
         headingLabel.setLayout(null);
-        headingLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        headingLabel.setFont(new Font("Serif", Font.BOLD, 25));
+        headingLabel.setHorizontalAlignment(SwingConstants.CENTER);
         controls.add(headingLabel);
 		
         diamondImageLabel = new JLabel(new ImageIcon("images/bank.jpg"));
@@ -112,7 +114,7 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	void refresh() {
 		if (Controller.diamondState == Controller.DiamondState.Stolen) {
 			diamondImageLabel.setIcon(new ImageIcon("images/diamond.gif"));
-			diamondImageLabel.setText("STOLEN");
+			headingLabel.setText("<html>DIAMOND STOLEN,<br>GET OUT!</html>");
 		}
 	}
 	

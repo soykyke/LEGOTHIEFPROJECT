@@ -21,7 +21,7 @@ public class Controller {
 	public static DiamondState diamondState;
 
 	public Controller(){
-		diamondState = DiamondState.Stolen;
+		diamondState = DiamondState.InSafe;
 		thiefCommunicator = new ThiefCommunicator();
 		scenarioCommunicator = new ScenarioCommunicator();
 		connect();

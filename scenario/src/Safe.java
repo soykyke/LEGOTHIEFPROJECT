@@ -143,8 +143,9 @@ public class Safe extends Thread {
     void sendStolenMessage() throws InterruptedException, IOException    {
         LCD.clearDisplay();
         LCD.drawString("Sending stolen Msg", 0, 1);
-        dos.writeChars("Stolen");
+        dos.writeInt(1);
         dos.flush();
+        LCD.drawString("Stolen Msg sent", 0, 1);
         Thread.sleep(1500);
     }
 }
