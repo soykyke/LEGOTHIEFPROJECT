@@ -30,7 +30,7 @@ public class GrabberShow extends JPanel implements Runnable {
 	
 	@Override
 	public void run() {
-		FrameGrabber grabber = new VideoInputFrameGrabber(1); // 1 for next camera
+		FrameGrabber grabber = new VideoInputFrameGrabber(3); // 1 for next camera
 		try {
 			grabber.start();
 			

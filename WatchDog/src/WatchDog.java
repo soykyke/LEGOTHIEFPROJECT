@@ -1,3 +1,6 @@
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
@@ -7,6 +10,8 @@ import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.addon.IRSeekerV2;
 import lejos.nxt.addon.IRSeekerV2.Mode;
+import lejos.nxt.comm.Bluetooth;
+import lejos.nxt.comm.NXTConnection;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 
@@ -20,17 +25,26 @@ public class WatchDog {
 			}
 	    }
 	}*/	
+	DataOutputStream dos = null;
 	
 	public static void main(String[] args) {
+		new WatchDog();
+	}
+	
+	public WatchDog() {
+		NXTConnection btc = Bluetooth.waitForConnection();
+		
+		dos = btc.openDataOutputStream();
+		
 	    DifferentialPilot pilot = new DifferentialPilot(5.6f, 15.3f, Motor.A, Motor.C, false);
 	    Navigator navigator = new Navigator(pilot);
 	    Behavior b1 = new ChaseThief(pilot, navigator);
 	    Behavior b2 = new Watch(pilot, navigator);
 	    Behavior b3 = new Walk(pilot, navigator);
-	    Behavior b4 = new Eate(pilot, navigator);
-	    Behavior b5 = new Sleep(pilot, navigator);
+	    Behavior b4 = new Eate(pilot, navigator, dos);
+	    Behavior b5 = new Sleep(pilot, navigator, dos);
 	    Behavior b6 = new DetectGreenZone(pilot, navigator);
-	    Behavior b7 = new DetectThief(pilot, navigator);
+	    Behavior b7 = new DetectThief(pilot, navigator, dos);
 	    Behavior b8 = new Exit();
 	    Behavior[] behaviorList =
 	    {
@@ -228,10 +242,12 @@ class Eate implements Behavior {
 	private DifferentialPilot pilot;
 	private Navigator navigator;
 	private boolean active = false;
+	DataOutputStream dos;
 	
-	public Eate(DifferentialPilot pilot, Navigator navigator) {
+	public Eate(DifferentialPilot pilot, Navigator navigator, DataOutputStream dos) {
 		this.pilot = pilot;
 	    this.navigator = navigator;
+	    this.dos = dos;
 		need = 0;
 	}
 	
@@ -261,6 +277,12 @@ class Eate implements Behavior {
 	    int now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
 			active = true;
+			try {
+				dos.writeInt(73);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Thread.yield(); //don't exit till suppressed
 		}
 		if (active == true) {
@@ -275,10 +297,12 @@ class Sleep implements Behavior {
 	private DifferentialPilot pilot;
 	private Navigator navigator;
 	private boolean active = false;
+	DataOutputStream dos;
 	
-	public Sleep(DifferentialPilot pilot, Navigator navigator) {
+	public Sleep(DifferentialPilot pilot, Navigator navigator, DataOutputStream dos) {
 		this.pilot = pilot;
 	    this.navigator = navigator;
+	    this.dos = dos;
 		need = -50;
 	}
 	
@@ -308,6 +332,12 @@ class Sleep implements Behavior {
 		}
 	    int now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
+			try {
+				dos.writeInt(591);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Thread.yield(); //don't exit till suppressed
 		}
 		if (!_suppressed) {
@@ -382,12 +412,14 @@ class DetectThief implements Behavior {
 	private TouchSensor touch1, touch2;
 	private DifferentialPilot pilot;
 	private Navigator navigator;
+	DataOutputStream dos;
 
-	public DetectThief(DifferentialPilot pilot, Navigator navigator) {
+	public DetectThief(DifferentialPilot pilot, Navigator navigator, DataOutputStream dos) {
 		touch1 = new TouchSensor(SensorPort.S2);
 		touch2 = new TouchSensor(SensorPort.S3);
 		this.pilot = pilot;
 	    this.navigator = navigator;
+	    this.dos = dos;
 	}
 	
 	public int takeControl() {
@@ -402,6 +434,12 @@ class DetectThief implements Behavior {
 
 	public void action() {
 		LCD.drawString("DT",0,5);
+		try {
+			dos.writeInt(317);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.exit(0);
 	}
 }
