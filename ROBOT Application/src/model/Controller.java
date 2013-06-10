@@ -2,8 +2,11 @@ package model;
 import java.io.IOException;
 
 import lejos.nxt.Button;
+import lejos.nxt.ColorSensor;
+import lejos.nxt.LCD;
+import lejos.nxt.SensorPort;
+import lejos.robotics.Color;
 import ControlSensors.Car;
-import ControlSensors.FinishDetection;
 
 import communications.CommBT;
 import communications.commDirections;
@@ -12,7 +15,7 @@ import communications.commDirections;
 public class Controller 
 {
     private CommBT commBT = new CommBT();
-    private FinishDetection finishDetection;
+	ColorSensor sensor;
 
     public Controller() 
     {
@@ -24,13 +27,26 @@ public class Controller
     	commDirections directions = new commDirections(commBT);
     	directions.setDaemon(true);	
     	directions.start();
-    	
-    	finishDetection = new FinishDetection(this);
     }
 	
     public void shutDown()
     {
-    	while (!Button.ESCAPE.isDown()) {};
+    	sensor = new ColorSensor(SensorPort.S1);
+		sensor.setFloodlight(true);
+		try {
+	    	while (!Button.ESCAPE.isDown()) {
+	    		int colorId = sensor.getColorID();
+				LCD.drawString("Color " + Integer.toString(colorId), 0, 0);
+				if (colorId == Color.GREEN)
+					sendFinishMessage();
+
+				Thread.sleep(10);
+	    	}
+    	} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     	commBT.closeConnection();
         // Shut down light sensor, motors
         Car.closeDirections();
