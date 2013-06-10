@@ -5,6 +5,7 @@ import scenario.Safe.Messages;
 import view.Sound;
 
 public class ScenarioCommunicator extends BluetoothCommunicator {
+	
 	public ScenarioCommunicator() {
 		super("fedor", "00:16:53:15:C2:59");
 	}
@@ -18,7 +19,7 @@ public class ScenarioCommunicator extends BluetoothCommunicator {
 	}
 	
 	public void listenForMessages() {
-		while (true) {
+		while (Controller.gameState.equals(Controller.GameState.DiamondInSafe)) {
 			int msg = readInt();
 			try {
 				handleMessage(msg);
@@ -31,7 +32,10 @@ public class ScenarioCommunicator extends BluetoothCommunicator {
 
 	private void handleMessage(int msg) throws Exception {
 		Messages message = Messages.values()[msg];
+		System.out.println(message);
 		switch (message) {
+		case NULL:
+			break;
 		case SUCCESS:
 			Controller.diamondStolen();
 			break;

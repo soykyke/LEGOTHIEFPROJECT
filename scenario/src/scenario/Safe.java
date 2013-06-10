@@ -95,6 +95,7 @@ public class Safe extends Thread {
                 if (buttons[button].isPressed()) {
                     second = button;
                     secondPressed = true;
+                    sendKeyPressMessage();
                     break;
                 }
             }
@@ -112,7 +113,7 @@ public class Safe extends Thread {
             }
             Thread.sleep(100);
         } 
-
+        
         int[] combination = new int[3];
         combination[0] = first;
         combination[1] = second;
@@ -145,7 +146,8 @@ public class Safe extends Thread {
         LCD.clearDisplay();
         LCD.drawString("Failed       ", 0, 0);
         Sound.beepSequence();
-        dos.write(Messages.FAIL.ordinal());
+        dos.writeInt(Messages.FAIL.ordinal());
+        dos.flush();
         Thread.sleep(1500);
     }
 
@@ -158,8 +160,11 @@ public class Safe extends Thread {
         Thread.sleep(1500);
     }
     
-    public void sendKeyPressMessage() throws IOException {
-    	dos.write(Messages.KEY_PRESS.ordinal());
+    public void sendKeyPressMessage() throws InterruptedException, IOException {
+    	LCD.clearDisplay();
+        LCD.drawString("Sending key", 0, 1);
+    	dos.writeInt(Messages.KEY_PRESS.ordinal());
     	dos.flush();
+    	Thread.sleep(1000);
     }
 }

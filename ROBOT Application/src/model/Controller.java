@@ -1,6 +1,9 @@
 package model;
+import java.io.IOException;
+
 import lejos.nxt.Button;
 import ControlSensors.Car;
+import ControlSensors.FinishDetection;
 
 import communications.CommBT;
 import communications.commDirections;
@@ -9,6 +12,7 @@ import communications.commDirections;
 public class Controller 
 {
     private CommBT commBT = new CommBT();
+    private FinishDetection finishDetection;
 
     public Controller() 
     {
@@ -20,6 +24,8 @@ public class Controller
     	commDirections directions = new commDirections(commBT);
     	directions.setDaemon(true);	
     	directions.start();
+    	
+    	finishDetection = new FinishDetection(this);
     }
 	
     public void shutDown()
@@ -38,4 +44,13 @@ public class Controller
         
         controller.shutDown();
     }
+
+	public void sendFinishMessage() {
+		try {
+			commBT.writeInt(1337);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
