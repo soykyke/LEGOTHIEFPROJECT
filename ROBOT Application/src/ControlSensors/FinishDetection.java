@@ -17,9 +17,10 @@ public class FinishDetection {
 			public void run () {
 				try {
 					while (true) {
-						if (sensor.getColorID() == Color.GREEN) {
+						int colorId = sensor.getColorID();
+						LCD.drawString("Color " + Integer.toString(colorId), 0, 0);
+						if (colorId == Color.GREEN)
 							controller.sendFinishMessage();
-						}
 						Thread.sleep(10);
 					}
 				} catch (InterruptedException e) {
