@@ -354,58 +354,26 @@ class DetectGreenZone extends Thread implements Behavior {
 	  _suppressed = false;
 	  active = true;
 	  LCD.drawString("DGZ",0,5);
-	  /*Sound.beepSequenceUp();
-	
-	  // Backward for 1000 msec
-	  LCD.drawString("Drive backward",0,3);
-	  Motor.A.backward();
-	  Motor.C.backward();
+	  pilot.setTravelSpeed(400 + Math.random() * 100);
+	  pilot.setRotateSpeed(400 + Math.random() * 100);
+	  pilot.backward();
 	  int now = (int)System.currentTimeMillis();
 	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
-		  Thread.yield(); //don't exit till suppressed
+	  	Thread.yield(); //don't exit till suppressed
 	  }
-    
-	  // Stop for 1000 msec
-	  LCD.drawString("Stopped       ",0,3);
-	  Motor.A.stop(); 
-	  Motor.C.stop();
+	  pilot.stop();
+	  pilot.rotate(180);
 	  now = (int)System.currentTimeMillis();
 	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
-		  Thread.yield(); //don't exit till suppressed
+	  	Thread.yield(); //don't exit till suppressed
 	  }
-    
-	  // Turn
-	  LCD.drawString("Turn          ",0,3);
-	  Motor.A.rotate(-180, true);// start Motor.A rotating backward
-	  Motor.C.rotate(-360, true);  // rotate C farther to make the turn
-	  while (!_suppressed && Motor.C.isMoving()) {
-		  Thread.yield(); //don't exit till suppressed
+	  pilot.stop();
+	  pilot.forward();
+	  now = (int)System.currentTimeMillis();
+	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  	Thread.yield(); //don't exit till suppressed
 	  }
-	  Motor.A.stop(); 
-	  Motor.C.stop();
-	  LCD.drawString("Stopped       ",0,3);
-	  Sound.beepSequence();
-	  active = false;  */
-	  	pilot.setTravelSpeed(400 + Math.random() * 100);
-	  	pilot.setRotateSpeed(400 + Math.random() * 100);
-	  	pilot.backward();
-	  	int now = (int)System.currentTimeMillis();
-	  	while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
-	  		Thread.yield(); //don't exit till suppressed
-	  	}
-	  	pilot.stop();
-	  	pilot.rotate(180);
-	  	now = (int)System.currentTimeMillis();
-	  	while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
-	  		Thread.yield(); //don't exit till suppressed
-	  	}
-	  	pilot.stop();
-	  	pilot.forward();
-	  	now = (int)System.currentTimeMillis();
-	  	while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
-	  		Thread.yield(); //don't exit till suppressed
-	  	}
-	  	pilot.stop();
+	  pilot.stop();
 	}
 }
 
