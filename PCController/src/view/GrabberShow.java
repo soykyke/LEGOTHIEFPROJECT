@@ -1,7 +1,10 @@
 package view;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.*;
 
+import javax.swing.GrayFilter;
 import javax.swing.JPanel;
 
 import com.googlecode.javacv.FrameGrabber;
@@ -17,6 +20,7 @@ public class GrabberShow extends JPanel implements Runnable {
 	IplImage img;
 	int width;
 	int height;
+	public boolean greyOut = false;
 	
 	public GrabberShow(int w, int h) {
 		super();
@@ -26,7 +30,7 @@ public class GrabberShow extends JPanel implements Runnable {
 	
 	@Override
 	public void run() {
-		FrameGrabber grabber = new VideoInputFrameGrabber(1); // 1 for next camera
+		FrameGrabber grabber = new VideoInputFrameGrabber(2); // 1 for next camera
 		try {
 			grabber.start();
 			
@@ -44,8 +48,16 @@ public class GrabberShow extends JPanel implements Runnable {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (img != null) {
-			Graphics2D g2 = (Graphics2D) g;
-			g2.drawImage(img.getBufferedImage(), 0, 0, width, height, null);
+			if (greyOut) {
+				Graphics2D g2 = (Graphics2D) g;
+				ImageFilter filter = new GrayFilter(true, 50);
+				ImageProducer producer = new FilteredImageSource(img.getBufferedImage().getSource(), filter);
+				Image image = this.createImage(producer);
+				g2.drawImage(image, 0, 0, width, height, null);
+			} else {
+				Graphics2D g2 = (Graphics2D) g;
+				g2.drawImage(img.getBufferedImage(), 0, 0, width, height, null);
+			}
 		}
 	}
 }

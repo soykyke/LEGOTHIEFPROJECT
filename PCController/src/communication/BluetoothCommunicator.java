@@ -64,4 +64,13 @@ public class BluetoothCommunicator {
 			e.printStackTrace();
 		}
 	}
+	
+	public int readInt() {
+		try {
+			return dis.readInt();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 }

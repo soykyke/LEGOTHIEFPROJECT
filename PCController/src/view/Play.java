@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.TimerTask;
 
 import javax.swing.*;
 
@@ -30,7 +31,13 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 	private final int NONE_VALUE = -5;
 	
 	Controller controller;
-	JPanel hud;
+	JLayeredPane hud;
+	JLabel diamondImageLabel;
+	JLabel headingLabel;
+	java.util.Timer refreshTimer;
+	GrabberShow gs;
+	JLabel overlayLabel;
+	
 	public Play(Controller c)  {
 		controller = c;
 		
@@ -43,35 +50,51 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 		getContentPane().setLayout(null);
 		setVisible(true);
 		
-		hud = new JPanel();
+		hud = new JLayeredPane();
 		hud.setBackground(Color.BLACK);
 		hud.setLocation(getHPosition(0), getVPosition(0));
 		hud.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 		hud.setLayout(null);
+
+		overlayLabel = new JLabel("YOU LOSE!");
+		overlayLabel.setFont(new Font("Serif", Font.BOLD, 100));
+		overlayLabel.setLayout(null);
+		overlayLabel.setLocation(20, SCREEN_HEIGHT / 3);
+		overlayLabel.setSize(SCREEN_WIDTH - 40, SCREEN_HEIGHT / 3);
+		overlayLabel.setBackground(Color.BLUE);
+		overlayLabel.setForeground(Color.RED);
+        overlayLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        overlayLabel.setVisible(false);
+		hud.add(overlayLabel, 2, 0);
 		
-		GrabberShow gs = new GrabberShow(VIDEO_WIDTH, VIDEO_HEIGHT);
+		gs = new GrabberShow(VIDEO_WIDTH, VIDEO_HEIGHT);
         Thread th = new Thread(gs);
         th.start();
 		
         gs.setSize(VIDEO_WIDTH, VIDEO_HEIGHT);
         gs.setLocation(0, 0);
         gs.setBackground(Color.BLACK);
-        gs.setOpaque(false);
-        hud.add(gs);
+        hud.add(gs, 1, 0);
         
         JPanel controls = new JPanel();
         controls.setSize(SCREEN_WIDTH - VIDEO_WIDTH, SCREEN_HEIGHT);
         controls.setLocation(VIDEO_WIDTH, 0);
         controls.setLayout(null);
         controls.setBackground(Color.WHITE);
+        
+        headingLabel = new JLabel("<html>STEAL<br>THE<br>DIAMOND!</html>");
+        headingLabel.setLocation(0, 0);
+        headingLabel.setSize(SCREEN_WIDTH - VIDEO_WIDTH, 250);
+        headingLabel.setLayout(null);
+        headingLabel.setFont(new Font("Serif", Font.BOLD, 25));
+        headingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        controls.add(headingLabel);
 		
-        JLabel label = new JLabel("THIEF");
-		label.setLocation(50, 20);
-		label.setLayout(null);
-		label.setFont(new Font("Serif", Font.PLAIN, 50));
-		label.setSize(150, 100);
-		controls.add(label);
-		
+        diamondImageLabel = new JLabel(new ImageIcon("images/bank.jpg"));
+		diamondImageLabel.setLocation(20, 250);
+		diamondImageLabel.setLayout(null);
+		diamondImageLabel.setSize(199, 177);
+		controls.add(diamondImageLabel);
 		
 		JLabel arrowLabel = new JLabel(new ImageIcon("images/uparrow.jpg"));
 		arrowLabel.setSize(150, 174);
@@ -79,7 +102,7 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 		arrowLabel.setLayout(null);
 		controls.add(arrowLabel);
 		
-		hud.add(controls);
+		hud.add(controls, 1, 0);
 		
 		hud.requestFocus();
 		hud.requestFocusInWindow();
@@ -88,6 +111,41 @@ public class Play extends JFrame implements ActionListener, KeyListener {
 		
 		getContentPane().add(hud);
 		getContentPane().setBackground(Color.GRAY);
+		
+		refreshTimer = new java.util.Timer();
+		refreshTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		}, 1000, 1000);
+	}
+	
+	void refresh() {
+		switch (Controller.gameState) {
+		case DiamondStolen:
+			diamondImageLabel.setIcon(new ImageIcon("images/diamond.gif"));
+			headingLabel.setText("<html>DIAMOND STOLEN,<br>GET OUT!<br>"
+					+ Integer.toString(Controller.countdownSecs) +
+					" secs left.</html>");
+			break;
+			
+		case Won:
+			gs.greyOut = true;
+			headingLabel.setText("<html>CONGRATZ!</html>");
+			overlayLabel.setText("YOU WON!");
+			overlayLabel.setForeground(Color.GREEN);
+	        overlayLabel.setVisible(true);
+			break;
+			
+		case GameOver:
+			headingLabel.setText("<html>GAME OVER!</html>");
+			overlayLabel.setText("YOU LOSE!");
+			overlayLabel.setForeground(Color.RED);
+	        overlayLabel.setVisible(true);
+			gs.greyOut = true;
+			break;
+		}
 	}
 	
 	int getHPosition(int relative) {
