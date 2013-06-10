@@ -1,5 +1,7 @@
 package communication;
 
+import model.Controller;
+
 public class ThiefCommunicator extends BluetoothCommunicator {
 
 	public ThiefCommunicator() {
@@ -10,4 +12,19 @@ public class ThiefCommunicator extends BluetoothCommunicator {
 		writeInt(directionCar);
 	}
 	
+	public void readMessages() {
+		new Thread() { 
+			public void run () {
+				try {
+					while (true) {
+						int m = readInt();
+						if (m == 1337)
+							Controller.gotOutOfBank();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
 }

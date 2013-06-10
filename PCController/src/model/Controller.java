@@ -38,6 +38,7 @@ public class Controller {
 		scenarioCommunicator = new ScenarioCommunicator();
 		connect();
 		scenarioCommunicator.readMessages();
+		thiefCommunicator.readMessages();
 	}
 
 	public void connect() {
