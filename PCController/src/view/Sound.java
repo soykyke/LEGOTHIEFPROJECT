@@ -37,17 +37,22 @@ public class Sound {
 			return null;
 	}
 
-	public void play() throws Exception {
-		if (clip != null) {
-			new Thread() {
-				public void run() {
-					synchronized (clip) {
-						clip.stop();
-						clip.setFramePosition(0);
-						clip.start();
+	public void play() {
+		try {
+			if (clip != null) {
+				new Thread() {
+					public void run() {
+						synchronized (clip) {
+							clip.stop();
+							clip.setFramePosition(0);
+							clip.start();
+						}
 					}
-				}
-			}.start();
+				}.start();
+			}
+		} catch (Exception e) {
+			System.err.println("Error when playing sound.");
+			e.printStackTrace();
 		}
 	}
 }

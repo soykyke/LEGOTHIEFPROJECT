@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import view.GUI;
 import view.Play;
+import view.Sound;
 import communication.ScenarioCommunicator;
 import communication.ThiefCommunicator;
 
@@ -50,7 +51,8 @@ public class Controller {
 
     public static void diamondStolen() {
     	gameState = GameState.DiamondStolen;
-
+    	Sound.safeOpen.play();
+    	
     	Controller.countdownTimer = new Timer();
     	Controller.countdownTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {

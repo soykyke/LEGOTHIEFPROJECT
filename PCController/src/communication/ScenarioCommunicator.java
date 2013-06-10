@@ -1,6 +1,8 @@
 package communication;
 
 import model.Controller;
+import scenario.Safe.Messages;
+import view.Sound;
 
 public class ScenarioCommunicator extends BluetoothCommunicator {
 	public ScenarioCommunicator() {
@@ -18,11 +20,27 @@ public class ScenarioCommunicator extends BluetoothCommunicator {
 	public void listenForMessages() {
 		while (true) {
 			int msg = readInt();
-			switch (msg) {
-			case 1:
-				Controller.diamondStolen();
-				break;
+			try {
+				handleMessage(msg);
+			} catch (Exception e) {
+				System.err.println("Error on received message: " + msg + "\n");
+				e.printStackTrace();
 			}
+		}
+	}
+
+	private void handleMessage(int msg) throws Exception {
+		Messages message = Messages.values()[msg];
+		switch (message) {
+		case SUCCESS:
+			Controller.diamondStolen();
+			break;
+		case FAIL:
+			Sound.safeFail.play();
+			break;
+		case KEY_PRESS:
+			Sound.pressKey.play();
+			break;
 		}
 	}
 }
