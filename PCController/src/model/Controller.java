@@ -12,6 +12,7 @@ import view.Play;
 import view.Sound;
 import communication.ScenarioCommunicator;
 import communication.ThiefCommunicator;
+import communication.WatchDogCommunicator;
 
 
 
@@ -27,23 +28,26 @@ public class Controller {
 
 	private ThiefCommunicator thiefCommunicator;
 	private ScenarioCommunicator scenarioCommunicator;
+	private WatchDogCommunicator watchDogCommunicator;
 	private static Timer countdownTimer;
-	public static GameState gameState;
+	public static GameState gameState = GameState.DiamondInSafe;
 	public static int countdownSecs = 180;
 	public static int energy = 100;
 
 	public Controller(){
-		gameState = GameState.DiamondInSafe;
-		thiefCommunicator = new ThiefCommunicator();
-		scenarioCommunicator = new ScenarioCommunicator();
-		connect();
-		scenarioCommunicator.readMessages();
-		thiefCommunicator.readMessages();
+		initCommunicators();
 	}
 
-	public void connect() {
+	public void initCommunicators() {
+		thiefCommunicator = new ThiefCommunicator();
+		scenarioCommunicator = new ScenarioCommunicator();
+		watchDogCommunicator = new WatchDogCommunicator();
 		thiefCommunicator.connect();
 		scenarioCommunicator.connect();
+		watchDogCommunicator.connect();
+		scenarioCommunicator.readMessages();
+		thiefCommunicator.readMessages();
+		watchDogCommunicator.readMessages();
 	}
 
 	public void controlButton(int directionCar) {

@@ -48,7 +48,7 @@ public class GUI extends JFrame implements ActionListener, KeyListener{
 		p1.add(connectButton);
 		connectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				controller.connect();
+				controller.initCommunicators();
 				p1.requestFocus();
 				p1.requestFocusInWindow();
 				p1.setFocusable(true);
