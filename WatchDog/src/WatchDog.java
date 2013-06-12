@@ -6,46 +6,97 @@ import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
-import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.addon.IRSeekerV2;
 import lejos.nxt.addon.IRSeekerV2.Mode;
-import lejos.nxt.comm.Bluetooth;
-import lejos.nxt.comm.NXTConnection;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 
 
 public class WatchDog {
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		LightSensor light = new LightSensor(SensorPort.S1);
+		IRSeekerV2 seeker = new IRSeekerV2(SensorPort.S4, Mode.AC);
+	    DifferentialPilot pilot = new DifferentialPilot(5.6f, 15.3f, Motor.A, Motor.C, false);
+	    Navigator navigator = new Navigator(pilot);
 		while (!Button.ESCAPE.isPressed()) {
 	        LCD.clear();
-	        LCD.drawInt(light.getLightValue(), 2,2);
+	        int direction = seeker.getDirection();
+			int distances[] = seeker.getSensorValues();
+			int distance = 0;
+			double angle = seeker.getAngle() * (-1);
+			LCD.drawInt(direction,0,6);
+			if (direction == 1) {
+				distance = distances[0];
 			}
-	    }
-	}*/	
-	DataOutputStream dos = null;
-	
-	public static void main(String[] args) {
-		new WatchDog();
+			if (direction == 2) {
+				distance = (distances[0] + distances[1]) / 2;
+			}
+			if (direction == 3) {
+				distance = distances[1];
+			}
+			if (direction == 4) {
+				distance = (distances[1] + distances[2]) / 2;
+			}
+			if (direction == 5) {
+				distance = distances[2];
+			}
+			if (direction == 6) {
+				distance = (distances[2] + distances[3]) / 2;
+			}
+			if (direction == 7) {
+				distance = distances[3];
+			}
+			if (direction == 8) {
+				distance = (distances[3] + distances[4]) / 2;
+			}
+			if (direction == 9) {
+				distance = distances[4];
+			}
+			distance = 255 - distance;
+			LCD.drawInt(distance,4,6);
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			pilot.setTravelSpeed(1000);
+			pilot.setRotateSpeed(1000);
+			pilot.rotate(angle);
+			while (pilot.isMoving()) {
+				Thread.yield(); //don't exit till suppressed
+			}
+			pilot.travel(distance / 4);
+			while (pilot.isMoving()) {
+				Thread.yield(); //don't exit till suppressed
+			}
+		}
 	}
+
+	private CommBT commBT = new CommBT();
+	ThiefState thiefState;
+	
+	/*public static void main(String[] args) {
+		new WatchDog();
+	}*/
 	
 	public WatchDog() {
-		NXTConnection btc = Bluetooth.waitForConnection();
-		
-		dos = btc.openDataOutputStream();
+		//commBT.openConnection();
+		thiefState = new ThiefState(commBT);
+		thiefState.setDaemon(true);	
+		thiefState.start();
 		
 	    DifferentialPilot pilot = new DifferentialPilot(5.6f, 15.3f, Motor.A, Motor.C, false);
 	    Navigator navigator = new Navigator(pilot);
-	    Behavior b1 = new ChaseThief(pilot, navigator);
+	    Behavior b1 = new ChaseThief(pilot, navigator, thiefState);
 	    Behavior b2 = new Watch(pilot, navigator);
 	    Behavior b3 = new Walk(pilot, navigator);
-	    Behavior b4 = new Eate(pilot, navigator, dos);
-	    Behavior b5 = new Sleep(pilot, navigator, dos);
+	    Behavior b4 = new Eate(pilot, navigator, commBT);
+	    Behavior b5 = new Sleep(pilot, navigator, commBT);
 	    Behavior b6 = new DetectGreenZone(pilot, navigator);
-	    Behavior b7 = new DetectThief(pilot, navigator, dos);
-	    Behavior b8 = new Exit();
+	    Behavior b7 = new DetectThief(pilot, navigator, commBT);
+	    Behavior b8 = new Exit(thiefState);
 	    Behavior[] behaviorList =
 	    {
 	      b1, b2, b3, b4, b5, b6, b7, b8
@@ -61,20 +112,19 @@ class ChaseThief implements Behavior {
 	private IRSeekerV2 seeker;
 	private DifferentialPilot pilot;
 	private Navigator navigator;
+	private ThiefState thiefState;
 	
-	public ChaseThief(DifferentialPilot pilot, Navigator navigator) {
+	public ChaseThief(DifferentialPilot pilot, Navigator navigator, ThiefState thiefState) {
 		seeker = new IRSeekerV2(SensorPort.S4, Mode.AC);
-		//seeker.setAddress(0x10);
 		this.pilot = pilot;
 		this.navigator = navigator;
-		//this.setDaemon(true);
-		//this.start();
+		this.thiefState = thiefState;
 	}
 	
 	public int takeControl() {
-		//if (seeker.getDirection() >= 3 && seeker.getDirection() <= 7)
-			return 90;
-	    //return 0;  // this behavior always wants control.
+		if (thiefState.isInRoom())
+			return 5;
+	    return 0;
 	}
 
 	public void suppress() {
@@ -144,7 +194,7 @@ class Watch implements Behavior {
 	
 	public int takeControl() {
 	    if (need >= 10000) {
-	    	return 40;
+	    	return 2;
 	    } else {
 	    	need += 2;
 	    }
@@ -203,7 +253,7 @@ class Walk implements Behavior {
 	}
 	
 	public int takeControl() {
-	    return 10;  // this behavior always wants control.
+	    return 1;  // this behavior always wants control.
 	}
 
 	public void suppress() {
@@ -242,18 +292,18 @@ class Eate implements Behavior {
 	private DifferentialPilot pilot;
 	private Navigator navigator;
 	private boolean active = false;
-	DataOutputStream dos;
+	private CommBT commBT;
 	
-	public Eate(DifferentialPilot pilot, Navigator navigator, DataOutputStream dos) {
+	public Eate(DifferentialPilot pilot, Navigator navigator, CommBT commBT) {
 		this.pilot = pilot;
 	    this.navigator = navigator;
-	    this.dos = dos;
+	    this.commBT = commBT;
 		need = 0;
 	}
 	
 	public int takeControl() {
 	    if (need >= 10000) {
-	    	return 60;
+	    	return 3;
 	    } else {
 	    	need += 1.5;
 	    }
@@ -278,7 +328,7 @@ class Eate implements Behavior {
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
 			active = true;
 			try {
-				dos.writeInt(73);
+				commBT.writeInt(73);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -298,19 +348,20 @@ class Sleep implements Behavior {
 	private Navigator navigator;
 	private boolean active = false;
 	DataOutputStream dos;
+	private CommBT commBT;
 	
-	public Sleep(DifferentialPilot pilot, Navigator navigator, DataOutputStream dos) {
+	public Sleep(DifferentialPilot pilot, Navigator navigator, CommBT commBT) {
 		this.pilot = pilot;
 	    this.navigator = navigator;
-	    this.dos = dos;
+	    this.commBT = commBT;
 		need = -50;
 	}
 	
 	public int takeControl() {
 	    if (need >= 10000 && active == false) {
-	    	return 80;
+	    	return 4;
 	    } else if (active) {
-	    	return 95;
+	    	return 6;
 	    } else {
 	    	need += 1;
 	    }
@@ -333,7 +384,7 @@ class Sleep implements Behavior {
 	    int now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
 			try {
-				dos.writeInt(591);
+				commBT.writeInt(591);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -372,7 +423,7 @@ class DetectGreenZone extends Thread implements Behavior {
 
 	public int takeControl() {
 		if (light > 50)
-			return 100;
+			return 7;
 		return 0;
 	}
 
@@ -412,19 +463,19 @@ class DetectThief implements Behavior {
 	private TouchSensor touch1, touch2;
 	private DifferentialPilot pilot;
 	private Navigator navigator;
-	DataOutputStream dos;
+	private CommBT commBT;
 
-	public DetectThief(DifferentialPilot pilot, Navigator navigator, DataOutputStream dos) {
+	public DetectThief(DifferentialPilot pilot, Navigator navigator, CommBT commBT) {
 		touch1 = new TouchSensor(SensorPort.S2);
 		touch2 = new TouchSensor(SensorPort.S3);
 		this.pilot = pilot;
 	    this.navigator = navigator;
-	    this.dos = dos;
+	    this.commBT = commBT;
 	}
 	
 	public int takeControl() {
 		if (touch1.isPressed() && touch2.isPressed())
-			return 200;
+			return 8;
 		return 0;
 	}
 
@@ -435,21 +486,38 @@ class DetectThief implements Behavior {
 	public void action() {
 		LCD.drawString("DT",0,5);
 		try {
-			dos.writeInt(317);
+			commBT.writeInt(317);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.exit(0);
+		//System.exit(0);
+		pilot.backward();
+		int now = (int)System.currentTimeMillis();
+		while (!_suppressed && ((int)System.currentTimeMillis()< now + 200) ) {
+			Thread.yield(); //don't exit till suppressed
+		}
+		pilot.stop();
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
 
 class Exit implements Behavior {
 	private boolean _suppressed = false;
+	private ThiefState thiefState;
+	
+	public Exit(ThiefState thiefState) {
+		this.thiefState = thiefState;
+	}
 
 	public int takeControl() {
-		if ( Button.ESCAPE.isPressed() )
-			return 300;
+		if ( Button.ESCAPE.isPressed() || thiefState.isDead())
+			return 9;
 		return 0;
 	}
 
