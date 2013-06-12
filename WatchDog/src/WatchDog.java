@@ -6,6 +6,7 @@ import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
+import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.addon.IRSeekerV2;
 import lejos.nxt.addon.IRSeekerV2.Mode;
@@ -54,7 +55,7 @@ public class WatchDog {
 	    Behavior b4 = new Eate(pilot, navigator, commBT);
 	    Behavior b5 = new Sleep(pilot, navigator, commBT);
 	    Behavior b6 = new DetectGreenZone(pilot, navigator);
-	    Behavior b7 = new DetectThief(pilot, navigator, commBT);
+	    Behavior b7 = new DetectThief(pilot, navigator, commBT, thiefState);
 	    Behavior b8 = new Exit(thiefState);
 	    Behavior[] behaviorList =
 	    {
@@ -172,7 +173,8 @@ class Watch implements Behavior {
 		while (need > 0) {
 			pilot.forward();
 			int now = (int)System.currentTimeMillis();
-			while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
+			int delay = 800 + (int)(Math.random() * ((1500 - 800) + 1));
+			while (!_suppressed && ((int)System.currentTimeMillis()< now + delay)) {
 				Thread.yield(); //don't exit till suppressed
 			}
 			pilot.stop();
@@ -181,7 +183,8 @@ class Watch implements Behavior {
 				break;
 			pilot.rotate(Math.random() * 720 - 360);
 			now = (int)System.currentTimeMillis();
-			while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
+			delay = 800 + (int)(Math.random() * ((1500 - 800) + 1));
+			while (!_suppressed && ((int)System.currentTimeMillis()< now + (delay)) ) {
 				Thread.yield(); //don't exit till suppressed
 			}
 			pilot.stop();
@@ -226,15 +229,21 @@ class Walk implements Behavior {
 		pilot.setRotateSpeed(400 + Math.random() * 100);
 		pilot.forward();
 		int now = (int)System.currentTimeMillis();
-		while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
+		int delay = 800 + (int)(Math.random() * ((1500 - 800) + 1));
+		while (!_suppressed && ((int)System.currentTimeMillis()< now + delay)) {
 			Thread.yield(); //don't exit till suppressed
+			
 		}
+		Sound.beep();
 		pilot.stop();
 		pilot.rotate(Math.random() * 720 - 360);
 		now = (int)System.currentTimeMillis();
-		while (!_suppressed && ((int)System.currentTimeMillis()< now + (800 + (int)(Math.random() * ((1500 - 800) + 1)))) ) {
+		delay = 800 + (int)(Math.random() * ((1500 - 800) + 1));
+		while (!_suppressed && ((int)System.currentTimeMillis()< now + delay) ) {
 			Thread.yield(); //don't exit till suppressed
+			
 		}
+		Sound.beep();
 		pilot.stop();
 		pilot.forward();
 		now = (int)System.currentTimeMillis();
@@ -279,11 +288,11 @@ class Eate implements Behavior {
 		LCD.drawString("Eate",0,5);
 		pilot.setTravelSpeed(500);
 		pilot.setRotateSpeed(500);
-		navigator.goTo(150, 150);
+		/*navigator.goTo(150, 150);
 		while (!_suppressed && navigator.isMoving() ) {
 			Thread.yield(); //don't exit till suppressed
 		}
-		navigator.stop();
+		navigator.stop();*/
 	    int now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
 			active = true;
@@ -335,13 +344,13 @@ class Sleep implements Behavior {
 	public void action() {
 		_suppressed = false;
 		LCD.drawString("Sleep",0,5);
-	    Motor.A.setSpeed(400);
-	    Motor.C.setSpeed(400);
-		navigator.goTo(0, 0);
+		pilot.setTravelSpeed(500);
+		pilot.setRotateSpeed(500);
+		/*navigator.goTo(0, 0);
 		while (!_suppressed && navigator.isMoving() ) {
 			Thread.yield(); //don't exit till suppressed
 		}
-		navigator.stop();
+		navigator.stop();*/
 		if (active != true) {
 			active = true;
 		}
@@ -398,24 +407,27 @@ class DetectGreenZone extends Thread implements Behavior {
 	public void action() {
 	  _suppressed = false;
 	  active = true;
+	  LCD.clearDisplay();
 	  LCD.drawString("DGZ",0,5);
+	  pilot.stop();
 	  pilot.setTravelSpeed(400 + Math.random() * 100);
 	  pilot.setRotateSpeed(400 + Math.random() * 100);
+	  
 	  pilot.backward();
 	  int now = (int)System.currentTimeMillis();
-	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 800) ) {
 	  	Thread.yield(); //don't exit till suppressed
 	  }
 	  pilot.stop();
 	  pilot.rotate(180);
 	  now = (int)System.currentTimeMillis();
-	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 800) ) {
 	  	Thread.yield(); //don't exit till suppressed
 	  }
 	  pilot.stop();
 	  pilot.forward();
 	  now = (int)System.currentTimeMillis();
-	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 1000) ) {
+	  while (!_suppressed && ((int)System.currentTimeMillis()< now + 800) ) {
 	  	Thread.yield(); //don't exit till suppressed
 	  }
 	  pilot.stop();
@@ -428,17 +440,19 @@ class DetectThief implements Behavior {
 	private DifferentialPilot pilot;
 	private Navigator navigator;
 	private CommBT commBT;
+	private ThiefState thiefState;
 
-	public DetectThief(DifferentialPilot pilot, Navigator navigator, CommBT commBT) {
+	public DetectThief(DifferentialPilot pilot, Navigator navigator, CommBT commBT, ThiefState thiefState) {
 		touch1 = new TouchSensor(SensorPort.S2);
 		touch2 = new TouchSensor(SensorPort.S3);
 		this.pilot = pilot;
 	    this.navigator = navigator;
 	    this.commBT = commBT;
+	    this.thiefState = thiefState;
 	}
 	
 	public int takeControl() {
-		if (touch1.isPressed() && touch2.isPressed())
+		if (touch1.isPressed() && touch2.isPressed() && thiefState.isInRoom())
 			return 8;
 		return 0;
 	}

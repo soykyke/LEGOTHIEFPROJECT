@@ -43,7 +43,7 @@ public class commDirections extends Thread{
 		}
 		else if (value == RIGHT_VALUE){
 			moving.forward(true);
-			moving.leftPower(70);
+			moving.leftPower(74);
 		}
 		else if (value == NONE_VALUE){
 			moving.leftPower(0);
