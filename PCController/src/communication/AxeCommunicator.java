@@ -35,4 +35,8 @@ public class AxeCommunicator extends BluetoothCommunicator {
 			break;
 		}
 	}
+
+	public void sendStartMessage() {
+		writeInt(1);
+	}
 }

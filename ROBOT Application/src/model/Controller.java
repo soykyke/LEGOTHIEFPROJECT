@@ -35,12 +35,7 @@ public class Controller
 		sensor.setFloodlight(true);
 		try {
 	    	while (!Button.ESCAPE.isDown()) {
-	    		int colorId = sensor.getColorID();
-				LCD.drawString("Color " + Integer.toString(colorId), 0, 0);
-				if (colorId == Color.GREEN){
-					sendFinishMessage();
-				}
-
+	    		readColorSensor();
 				Thread.sleep(10);
 	    	}
     	} catch (InterruptedException e) {
@@ -53,7 +48,33 @@ public class Controller
         Car.closeDirections();
     }
     
-    public static void main(String[] args) 
+    void readColorSensor() {
+    	int colorId = sensor.getColorID();
+		LCD.drawString("Color " + Integer.toString(colorId), 0, 0);
+
+		switch (colorId) {
+		case Color.GREEN:
+			sendFinishMessage();
+			break;
+			
+		case Color.WHITE:
+			sendWatchDogAreaMessage();
+			break;
+		}
+    }
+    
+    private void sendWatchDogAreaMessage() {
+    	try {
+			LCD.drawString("DOG", 5, 5);
+			commBT.writeInt(10);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			LCD.drawString("I AM IN EXCEPTION", 5, 5);
+			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) 
     {
         Controller controller = new Controller();
         

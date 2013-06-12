@@ -18,8 +18,14 @@ public class ThiefCommunicator extends BluetoothCommunicator {
 				try {
 					while (true) {
 						int m = readInt();
-						if (m == 1337)
+						switch (m) {
+						case 1337:
 							Controller.gotOutOfBank();
+							break;
+						case 10:
+							Controller.inWatchDogArea();
+							break;
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

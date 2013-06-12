@@ -1,4 +1,5 @@
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -9,8 +10,10 @@ import lejos.nxt.comm.NXTConnection;
 public class Axe  {
 	TouchSensor touchSensor = new TouchSensor(SensorPort.S1);
 	boolean wasPressed = true;
+	NXTConnection btc;
+	DataOutputStream dos;
     
-    public void setTurning() {
+    void setTurning() {
         Motor.A.setSpeed(90);
         Motor.A.forward();
     }
@@ -19,7 +22,18 @@ public class Axe  {
         Motor.A.rotateTo(90);
     }
     
-    public void checkTouch() {
+    public void init() {
+    	btc = Bluetooth.waitForConnection();
+    	dos = btc.openDataOutputStream();
+    	DataInputStream dis = btc.openDataInputStream();
+    	try {
+			if (dis.readInt() != 1)
+				return;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+    	setTurning();
+    	
     	new Thread() { 
 			public void run () {
 				try {
@@ -37,10 +51,6 @@ public class Axe  {
 		
 		new Thread() { 
 			public void run () {
-				NXTConnection btc = Bluetooth.waitForConnection();
-				
-				DataOutputStream dos = btc.openDataOutputStream();
-				
 				try {
 					while (true) {
 						LCD.drawString(wasPressed ? "true" : "false", 0, 0);
@@ -66,8 +76,7 @@ public class Axe  {
     
     public static void main(String[] args) {
     	Axe axe = new Axe();
-    	axe.setTurning();
-    	axe.checkTouch();
+    	axe.init();
     	while (!Button.ESCAPE.isDown()) {
     	}
     }

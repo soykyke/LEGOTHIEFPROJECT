@@ -43,4 +43,8 @@ public class WatchDogCommunicator extends BluetoothCommunicator {
 			break;
 		}
 	}
+
+	public void sendInWatchDogAreaMessage() {
+		writeInt(1);
+	}
 }

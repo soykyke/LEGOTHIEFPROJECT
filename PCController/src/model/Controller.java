@@ -27,10 +27,10 @@ public class Controller {
 		Won
 	}
 
-	private ThiefCommunicator thiefCommunicator;
-	private ScenarioCommunicator scenarioCommunicator;
-	private WatchDogCommunicator watchDogCommunicator;
-	private AxeCommunicator axeCommunicator;
+	private static ThiefCommunicator thiefCommunicator;
+	private static ScenarioCommunicator scenarioCommunicator;
+	private static WatchDogCommunicator watchDogCommunicator;
+	private static AxeCommunicator axeCommunicator;
 	private static Timer countdownTimer;
 	public static GameState gameState = GameState.DiamondInSafe;
 	public static int countdownSecs = 180;
@@ -38,6 +38,7 @@ public class Controller {
 
 	public Controller(){
 		initCommunicators();
+		diamondStolen();
 	}
 
 	public void initCommunicators() {
@@ -73,6 +74,8 @@ public class Controller {
                 }
             }
         }, 1000, 1000);
+    	
+    	axeCommunicator.sendStartMessage();
     }
     
     public static void bittenByDog() {
@@ -99,6 +102,8 @@ public class Controller {
 	public static void thiefWasCaughtByAxe() {
 		gameState = GameState.GameOver;
 	}
+
+	public static void inWatchDogArea() {
+		watchDogCommunicator.sendInWatchDogAreaMessage();
+	}
 }
-
-
