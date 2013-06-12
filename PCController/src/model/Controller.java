@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import view.GUI;
 import view.Play;
 import view.Sound;
+import communication.AxeCommunicator;
 import communication.ScenarioCommunicator;
 import communication.ThiefCommunicator;
 import communication.WatchDogCommunicator;
@@ -29,6 +30,7 @@ public class Controller {
 	private ThiefCommunicator thiefCommunicator;
 	private ScenarioCommunicator scenarioCommunicator;
 	private WatchDogCommunicator watchDogCommunicator;
+	private AxeCommunicator axeCommunicator;
 	private static Timer countdownTimer;
 	public static GameState gameState = GameState.DiamondInSafe;
 	public static int countdownSecs = 180;
@@ -42,12 +44,15 @@ public class Controller {
 		thiefCommunicator = new ThiefCommunicator();
 		scenarioCommunicator = new ScenarioCommunicator();
 		watchDogCommunicator = new WatchDogCommunicator();
+		axeCommunicator = new AxeCommunicator();
 		thiefCommunicator.connect();
 		scenarioCommunicator.connect();
 		watchDogCommunicator.connect();
+		axeCommunicator.connect();
 		scenarioCommunicator.readMessages();
 		thiefCommunicator.readMessages();
 		watchDogCommunicator.readMessages();
+		axeCommunicator.readMessages();
 	}
 
 	public void controlButton(int directionCar) {
@@ -89,6 +94,10 @@ public class Controller {
 				ex.setVisible(true);
 			}
 		});
+	}
+
+	public static void thiefWasCaughtByAxe() {
+		gameState = GameState.GameOver;
 	}
 }
 

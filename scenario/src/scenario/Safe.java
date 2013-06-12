@@ -138,7 +138,6 @@ public class Safe extends Thread {
         LCD.clearDisplay();
         LCD.drawString("Succeeded   ", 0, 0);
         sendStolenMessage();
-        Axe.setTurning();
         Thread.sleep(1500);
     }
 
