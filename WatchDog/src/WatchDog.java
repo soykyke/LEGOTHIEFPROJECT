@@ -14,75 +14,34 @@ import lejos.robotics.navigation.Navigator;
 
 
 public class WatchDog {
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		LightSensor light = new LightSensor(SensorPort.S1);
 		IRSeekerV2 seeker = new IRSeekerV2(SensorPort.S4, Mode.AC);
 	    DifferentialPilot pilot = new DifferentialPilot(5.6f, 15.3f, Motor.A, Motor.C, false);
 	    Navigator navigator = new Navigator(pilot);
-		while (!Button.ESCAPE.isPressed()) {
+		//while (!Button.ESCAPE.isPressed()) {
 	        LCD.clear();
-	        int direction = seeker.getDirection();
-			int distances[] = seeker.getSensorValues();
-			int distance = 0;
-			double angle = seeker.getAngle() * (-1);
-			LCD.drawInt(direction,0,6);
-			if (direction == 1) {
-				distance = distances[0];
-			}
-			if (direction == 2) {
-				distance = (distances[0] + distances[1]) / 2;
-			}
-			if (direction == 3) {
-				distance = distances[1];
-			}
-			if (direction == 4) {
-				distance = (distances[1] + distances[2]) / 2;
-			}
-			if (direction == 5) {
-				distance = distances[2];
-			}
-			if (direction == 6) {
-				distance = (distances[2] + distances[3]) / 2;
-			}
-			if (direction == 7) {
-				distance = distances[3];
-			}
-			if (direction == 8) {
-				distance = (distances[3] + distances[4]) / 2;
-			}
-			if (direction == 9) {
-				distance = distances[4];
-			}
-			distance = 255 - distance;
-			LCD.drawInt(distance,4,6);
-			try {
-				Thread.sleep(10);
+	        LCD.drawInt(light.getLightValue(), 0, 2);
+	        pilot.forward();
+	        pilot.stop();
+	        try {
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			pilot.setTravelSpeed(1000);
-			pilot.setRotateSpeed(1000);
-			pilot.rotate(angle);
-			while (pilot.isMoving()) {
-				Thread.yield(); //don't exit till suppressed
-			}
-			pilot.travel(distance / 4);
-			while (pilot.isMoving()) {
-				Thread.yield(); //don't exit till suppressed
-			}
-		}
-	}
+		//}
+	}*/
 
 	private CommBT commBT = new CommBT();
 	ThiefState thiefState;
 	
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		new WatchDog();
-	}*/
+	}
 	
 	public WatchDog() {
-		//commBT.openConnection();
+		commBT.openConnection();
 		thiefState = new ThiefState(commBT);
 		thiefState.setDaemon(true);	
 		thiefState.start();
@@ -173,7 +132,7 @@ class ChaseThief implements Behavior {
 		while (!_suppressed && pilot.isMoving()) {
 			Thread.yield(); //don't exit till suppressed
 		}
-		pilot.travel(distance / 10);
+		pilot.travel(distance / 3);
 		while (!_suppressed && pilot.isMoving()) {
 			Thread.yield(); //don't exit till suppressed
 		}
@@ -298,7 +257,7 @@ class Eate implements Behavior {
 		this.pilot = pilot;
 	    this.navigator = navigator;
 	    this.commBT = commBT;
-		need = 0;
+		need = 1000;
 	}
 	
 	public int takeControl() {
@@ -320,10 +279,11 @@ class Eate implements Behavior {
 		LCD.drawString("Eate",0,5);
 		pilot.setTravelSpeed(500);
 		pilot.setRotateSpeed(500);
-		navigator.goTo(50, 50);
+		navigator.goTo(150, 150);
 		while (!_suppressed && navigator.isMoving() ) {
 			Thread.yield(); //don't exit till suppressed
 		}
+		navigator.stop();
 	    int now = (int)System.currentTimeMillis();
 		while (!_suppressed && ((int)System.currentTimeMillis()< now + 10000) ) {
 			active = true;
@@ -354,7 +314,7 @@ class Sleep implements Behavior {
 		this.pilot = pilot;
 	    this.navigator = navigator;
 	    this.commBT = commBT;
-		need = -50;
+		need = 0;
 	}
 	
 	public int takeControl() {
@@ -378,6 +338,10 @@ class Sleep implements Behavior {
 	    Motor.A.setSpeed(400);
 	    Motor.C.setSpeed(400);
 		navigator.goTo(0, 0);
+		while (!_suppressed && navigator.isMoving() ) {
+			Thread.yield(); //don't exit till suppressed
+		}
+		navigator.stop();
 		if (active != true) {
 			active = true;
 		}
@@ -422,7 +386,7 @@ class DetectGreenZone extends Thread implements Behavior {
 	}
 
 	public int takeControl() {
-		if (light > 50)
+		if (light < 43)
 			return 7;
 		return 0;
 	}
