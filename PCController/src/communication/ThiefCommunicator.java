@@ -18,12 +18,18 @@ public class ThiefCommunicator extends BluetoothCommunicator {
 				try {
 					while (true) {
 						int m = readInt();
+						
 						switch (m) {
-						case 1337:
+						case lejos.robotics.Color.GREEN:
 							Controller.gotOutOfBank();
 							break;
-						case 10:
-							Controller.inWatchDogArea();
+							
+						case lejos.robotics.Color.WHITE:
+							Controller.setInWatchDogArea(true);
+							break;
+							
+						default:
+							Controller.setInWatchDogArea(false);
 							break;
 						}
 					}

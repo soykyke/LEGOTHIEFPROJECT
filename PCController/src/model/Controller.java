@@ -35,10 +35,10 @@ public class Controller {
 	public static GameState gameState = GameState.DiamondInSafe;
 	public static int countdownSecs = 180;
 	public static int energy = 100;
+	public static boolean isInWatchDogArea = false;
 
 	public Controller(){
 		initCommunicators();
-		diamondStolen();
 	}
 
 	public void initCommunicators() {
@@ -103,7 +103,7 @@ public class Controller {
 		gameState = GameState.GameOver;
 	}
 
-	public static void inWatchDogArea() {
-		watchDogCommunicator.sendInWatchDogAreaMessage();
+	public static void setInWatchDogArea(boolean b) {
+		isInWatchDogArea = b;
 	}
 }

@@ -51,29 +51,13 @@ public class Controller
     void readColorSensor() {
     	int colorId = sensor.getColorID();
 		LCD.drawString("Color " + Integer.toString(colorId), 0, 0);
-
-		switch (colorId) {
-		case Color.GREEN:
-			sendFinishMessage();
-			break;
-			
-		case Color.WHITE:
-			sendWatchDogAreaMessage();
-			break;
-		}
-    }
-    
-    private void sendWatchDogAreaMessage() {
-    	try {
-			LCD.drawString("DOG", 5, 5);
-			commBT.writeInt(10);
+		try {
+			commBT.writeInt(colorId);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			LCD.drawString("I AM IN EXCEPTION", 5, 5);
 			e.printStackTrace();
 		}
-	}
-
+    }
 	public static void main(String[] args) 
     {
         Controller controller = new Controller();
@@ -82,15 +66,4 @@ public class Controller
         
         controller.shutDown();
     }
-
-	public void sendFinishMessage() {
-		try {
-			LCD.drawString("I AM HERE", 5, 5);
-			commBT.writeInt(1337);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			LCD.drawString("I AM IN EXCEPTION", 5, 5);
-			e.printStackTrace();
-		}
-	}
 }

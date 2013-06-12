@@ -15,6 +15,11 @@ public class WatchDogCommunicator extends BluetoothCommunicator {
 				listenForMessages();
 			}
 		}.start();
+		new Thread() { 
+			public void run () {
+				sendInWatchDogAreaMessages();
+			}
+		}.start();
 	}
 	
 	void listenForMessages() {
@@ -44,7 +49,21 @@ public class WatchDogCommunicator extends BluetoothCommunicator {
 		}
 	}
 
-	public void sendInWatchDogAreaMessage() {
-		writeInt(1);
+	public void sendInWatchDogAreaMessages() {
+		while (true) {
+			if (Controller.gameState == Controller.GameState.GameOver ||
+					Controller.gameState == Controller.GameState.Won)
+				writeInt(2);
+			else if (Controller.isInWatchDogArea)
+				writeInt(1);
+			else
+				writeInt(0);
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
