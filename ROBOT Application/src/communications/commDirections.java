@@ -29,19 +29,21 @@ public class commDirections extends Thread{
 	
 		if (value == UP_VALUE){
 			moving.forward(true);
-			moving.leftPower(85);
-			moving.rightPower(85);
+			moving.leftPower(84);
+			moving.rightPower(80);
 		}
 		else if (value == DOWN_VALUE){
 			moving.forward(false);
-			moving.leftPower(70);
+			moving.leftPower(74);
 			moving.rightPower(70);
 		}
 		else if (value == LEFT_VALUE){
-			moving.rightPower(75);
+			moving.forward(true);
+			moving.rightPower(70);
 		}
 		else if (value == RIGHT_VALUE){
-			moving.leftPower(75);
+			moving.forward(true);
+			moving.leftPower(74);
 		}
 		else if (value == NONE_VALUE){
 			moving.leftPower(0);
