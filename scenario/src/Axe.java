@@ -23,6 +23,7 @@ public class Axe  {
     }
     
     public void init() {
+    	Motor.A.stop();
     	btc = Bluetooth.waitForConnection();
     	dos = btc.openDataOutputStream();
     	DataInputStream dis = btc.openDataInputStream();
@@ -64,7 +65,7 @@ public class Axe  {
 							}
 						}
 						wasPressed = false;
-						Thread.sleep(3500);
+						Thread.sleep(4000);
 					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block

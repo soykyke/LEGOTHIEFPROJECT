@@ -20,7 +20,7 @@ public class ThiefCommunicator extends BluetoothCommunicator {
 						int m = readInt();
 						
 						switch (m) {
-						case lejos.robotics.Color.GREEN:
+						case lejos.robotics.Color.RED:
 							Controller.gotOutOfBank();
 							break;
 							

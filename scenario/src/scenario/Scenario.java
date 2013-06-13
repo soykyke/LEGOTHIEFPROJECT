@@ -13,13 +13,13 @@ public class Scenario {
         NXTConnection btc = Bluetooth.waitForConnection();
 		
 		dos = btc.openDataOutputStream();   
-		dis = btc.openDataOutputStream();
+		//dis = btc.openDataOutputStream();
 
-        int[] key = {0,1,2};
+        int[] key = {0,2,1};
         new Safe(key, dos).start();
         
         try {
-			dis.close();
+			//dis.close();
 			dos.close();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -33,7 +33,7 @@ public class Controller {
 	private static AxeCommunicator axeCommunicator;
 	private static Timer countdownTimer;
 	public static GameState gameState = GameState.DiamondInSafe;
-	public static int countdownSecs = 180;
+	public static int countdownSecs = 240;
 	public static int energy = 100;
 	public static boolean isInWatchDogArea = false;
 

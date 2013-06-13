@@ -83,7 +83,7 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         controls.setLayout(null);
         controls.setBackground(Color.WHITE);
         
-        headingLabel = new JLabel("<html>STEAL<br>THE<br>DIAMOND!</html>");
+        headingLabel = new JLabel("<html>STEAL<br>THE<br>DIAMOND!<br>Key: 1-2-3</html>");
         headingLabel.setLocation(0, 0);
         headingLabel.setSize(SCREEN_WIDTH - VIDEO_WIDTH, 250);
         headingLabel.setLayout(null);
@@ -91,6 +91,15 @@ public class Play extends JFrame implements ActionListener, KeyListener {
         headingLabel.setHorizontalAlignment(SwingConstants.CENTER);
         controls.add(headingLabel);
 		
+        //headingLabel = new JLabel("<html>STEAL<br>THE<br>DIAMOND!</html>");
+        //headingLabel.setLocation(0, 0);
+        //headingLabel.setSize(SCREEN_WIDTH - VIDEO_WIDTH, 250);
+        //headingLabel.setLayout(null);
+        //headingLabel.setFont(new Font("Serif", Font.BOLD, 25));
+        //headingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        //controls.add(headingLabel);
+		
+        
         diamondImageLabel = new JLabel(new ImageIcon("images/bank.jpg"));
 		diamondImageLabel.setLocation(20, 300);
 		diamondImageLabel.setLayout(null);
